@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2週間プラン・チェック</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f9fc;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --border: #e5e7eb;
+      --done: #2563eb;
+      --header-from: #2563eb;
+      --header-to: #1d4ed8;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --shadow: 0 2px 12px rgba(0,0,0,0.04);
+      --shadow-card: 0 4px 20px rgba(37,99,235,0.15);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 20px 20px 40px;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+    .header {
+      text-align: center;
+      padding: 28px 20px 24px;
+      margin: 0 -20px 24px -20px;
+      background: linear-gradient(160deg, var(--header-from) 0%, var(--header-to) 100%);
+      color: #fff;
+      border-radius: 0 0 20px 20px;
+      box-shadow: var(--shadow-card);
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header .sub {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      opacity: 0.88;
+      font-weight: 400;
+    }
+    .day-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .day-nav button {
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.25rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .day-nav button:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    .day-nav button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .day-nav span {
+      font-weight: 700;
+      font-size: 1.15rem;
+      min-width: 68px;
+      text-align: center;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .progress-ring {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent) 0deg var(--p), var(--border) var(--p) 360deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .progress-ring-inner {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--accent);
+    }
+    .progress-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .progress-text strong { color: var(--text); }
+    .progress-text.achieved { color: var(--accent); }
+    .progress-text.achieved strong { color: var(--accent); }
+    .target-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .target-wrap span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .target-btn {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .target-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .target-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .card-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin: 0 0 14px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin: -6px 0 12px 0;
+      padding: 8px 10px;
+      background: var(--accent-soft);
+      border-radius: 8px;
+      line-height: 1.45;
+    }
+    .menu-supplement {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      background: #f8f9fc;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      line-height: 1.55;
+    }
+    .menu-supplement .meal-label {
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 8px;
+    }
+    .menu-supplement .meal-label:first-child { margin-top: 0; }
+    .menu-supplement ul { margin: 2px 0 0 0; padding-left: 1.2em; }
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f2f1ef;
+      min-height: 52px;
+    }
+    .item:last-child { border-bottom: none; }
+    .item input[type="checkbox"] {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--surface);
+    }
+    .item input[type="checkbox"]:checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .item input[type="checkbox"]:checked::after {
+      content: "";
+      display: block;
+      width: 6px;
+      height: 11px;
+      margin: 5px 0 0 7px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    .item label {
+      cursor: pointer;
+      flex: 1;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+    .item.done label {
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+    .item input[type="checkbox"]:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>2週間・見た目最大化</h1>
+  <div class="sub">今日やったことをチェック</div>
+</div>
+
+<div class="day-nav">
+  <button type="button" id="prev" aria-label="前の日">‹</button>
+  <span id="dayLabel">1日目</span>
+  <button type="button" id="next" aria-label="次の日">›</button>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-ring" id="progressRing" style="--p: 0deg">
+    <div class="progress-ring-inner" id="progressNum">0</div>
+  </div>
+  <div>
+    <p class="progress-text" id="progressText"><strong>0</strong> / 目標10 完了</p>
+    <div class="target-wrap">
+      <span>目標:</span>
+      <button type="button" class="target-btn" data-target="6">6</button>
+      <button type="button" class="target-btn" data-target="8">8</button>
+      <button type="button" class="target-btn active" data-target="10">10</button>
+      <button type="button" class="target-btn" data-target="12">12</button>
+      <button type="button" class="target-btn" data-target="15">15</button>
+      <span>個</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="card-title">食事</h2>
+  <div class="menu-supplement">
+    <div class="meal-label">朝（やや多め）</div>
+    <ul><li>例：卵・納豆、ヨーグルト、バナナ、野菜サラダ、味噌汁、ごはん</li></ul>
+    <div class="meal-label">昼（しっかり）</div>
+    <ul><li>例：鶏胸や魚の焼き物、野菜のおかず、きのこ・海藻、ごはん or 芋類</li></ul>
+    <div class="meal-label">夜（軽め・就寝3時間前まで）</div>
+    <ul><li>例：豆腐・白身魚、温野菜、汁物、ごはん少なめ or なし</li></ul>
+    <div class="meal-label">間食（決めた時間・量のみ）</div>
+    <ul><li>例：15時ーギリシャヨーグルト100g、無糖ゼリー、きゅうり・トマト</li></ul>
+  </div>
+  <div class="item"><input type="checkbox" id="m1" data-key="m1"><label for="m1">食事のカロリーを目安内にした（1日1,400〜1,500kcal）</label></div>
+  <div class="item"><input type="checkbox" id="m2" data-key="m2"><label for="m2">味付けは薄めにした・水をこまめに飲んだ（1.5〜2L）</label></div>
+  <div class="item"><input type="checkbox" id="m3" data-key="m3"><label for="m3">お酒・ジュースは飲まなかった</label></div>
+  <div class="item"><input type="checkbox" id="m4" data-key="m4"><label for="m4">おやつは決めた時間・量だけにした</label></div>
+  <div class="item"><input type="checkbox" id="m5" data-key="m5"><label for="m5">最初に野菜か汁物を食べた・食卓でだけ食べた</label></div>
+</div>
+
+<div class="card">
+  <h2 class="card-title">運動</h2>
+  <div class="item"><input type="checkbox" id="e1" data-key="e1"><label for="e1">バレエのレッスンをした</label></div>
+  <div class="item"><input type="checkbox" id="e2" data-key="e2"><label for="e2">パーソナルトレーニングをした</label></div>
+  <div class="item"><input type="checkbox" id="e3" data-key="e3"><label for="e3">自宅で筋トレをした（15〜20分・ウエスト・二の腕・下腹）</label></div>
+  <div class="item"><input type="checkbox" id="e4" data-key="e4"><label for="e4">エアロバイクをした（20〜30分）</label></div>
+  <div class="item"><input type="checkbox" id="e5" data-key="e5"><label for="e5">5分ストレッチをした（バレエ＋朝の軽いストレッチ）</label></div>
+</div>
+
+<div class="card">
+  <h2 class="card-title">むくみ・見た目</h2>
+  <p class="card-hint">むくみ対策の食材の例：ほうれん草、バナナ、アボカド、のり・ワカメ、芋類、きゅうり、トマト など。どれか1品以上取り入れると◎</p>
+  <div class="item"><input type="checkbox" id="v1" data-key="v1"><label for="v1">むくみ対策の食材を1品以上食べた・足を高くして休む時間をとった</label></div>
+  <div class="item"><input type="checkbox" id="v2" data-key="v2"><label for="v2">背中を伸ばして肋骨を締める姿勢を意識した</label></div>
+  <div class="item"><input type="checkbox" id="v3" data-key="v3"><label for="v3">全身写真を撮った（1・7・14日目だけ）</label></div>
+</div>
+
+<div class="card">
+  <h2 class="card-title">習慣</h2>
+  <div class="item"><input type="checkbox" id="h1" data-key="h1"><label for="h1">今日の振り返りを1行メモした（3・7・10日目）</label></div>
+  <div class="item"><input type="checkbox" id="h2" data-key="h2"><label for="h2">ご褒美を1品楽しんだ（7日目・量は事前に決めたもの）</label></div>
+</div>
+
+<script>
+(function() {
+  const STORAGE_KEY = 'diet-plan-check';
+  const TARGET_KEY = 'diet-plan-target';
+  let currentDay = 1;
+  const totalDays = 14;
+  const allKeys = ['m1','m2','m3','m4','m5','e1','e2','e3','e4','e5','v1','v2','v3','h1','h2'];
+
+  const dayLabel = document.getElementById('dayLabel');
+  const progressRing = document.getElementById('progressRing');
+  const progressNum = document.getElementById('progressNum');
+  const progressText = document.getElementById('progressText');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  function getData() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (_) { return {}; }
+  }
+  function setData(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+  function getTarget() {
+    var t = localStorage.getItem(TARGET_KEY);
+    var n = parseInt(t, 10);
+    return (n >= 1 && n <= 15) ? n : 10;
+  }
+  function setTarget(n) {
+    localStorage.setItem(TARGET_KEY, String(n));
+  }
+  function getDayKey() { return 'day' + currentDay; }
+
+  function loadDay() {
+    const data = getData();
+    const dayData = data[getDayKey()] || {};
+    allKeys.forEach(function(key) {
+      const el = document.querySelector('[data-key="' + key + '"]');
+      if (!el) return;
+      const checked = !!dayData[key];
+      el.checked = checked;
+      el.closest('.item').classList.toggle('done', checked);
+    });
+    dayLabel.textContent = currentDay + '日目';
+    prevBtn.disabled = currentDay <= 1;
+    nextBtn.disabled = currentDay >= totalDays;
+    renderTargetButtons();
+    updateProgress(dayData);
+  }
+
+  function renderTargetButtons() {
+    var target = getTarget();
+    document.querySelectorAll('.target-btn').forEach(function(btn) {
+      var n = parseInt(btn.getAttribute('data-target'), 10);
+      btn.classList.toggle('active', n === target);
+    });
+  }
+
+  function updateProgress(dayData) {
+    var done = allKeys.filter(function(k) { return dayData[k]; }).length;
+    var target = getTarget();
+    var rate = target > 0 ? Math.min(done / target, 1) : 0;
+    var deg = rate * 360;
+    progressRing.style.setProperty('--p', deg + 'deg');
+    progressNum.textContent = done;
+    var achieved = done >= target;
+    progressText.classList.toggle('achieved', achieved);
+    progressText.innerHTML = '<strong>' + done + '</strong> / 目標' + target + ' 完了' + (achieved ? ' ✓' : '');
+  }
+
+  function saveCheck(key, checked) {
+    const data = getData();
+    const dk = getDayKey();
+    if (!data[dk]) data[dk] = {};
+    data[dk][key] = checked;
+    setData(data);
+    var item = document.querySelector('[data-key="' + key + '"]');
+    if (item) item.closest('.item').classList.toggle('done', checked);
+    updateProgress(data[dk]);
+  }
+
+  document.querySelectorAll('[data-key]').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      saveCheck(this.getAttribute('data-key'), this.checked);
+    });
+  });
+  prevBtn.addEventListener('click', function() {
+    if (currentDay <= 1) return;
+    currentDay--;
+    loadDay();
+  });
+  nextBtn.addEventListener('click', function() {
+    if (currentDay >= totalDays) return;
+    currentDay++;
+    loadDay();
+  });
+
+  document.querySelectorAll('.target-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var n = parseInt(this.getAttribute('data-target'), 10);
+      setTarget(n);
+      renderTargetButtons();
+      var data = getData();
+      updateProgress(data[getDayKey()] || {});
+    });
+  });
+
+  loadDay();
+})();
+</script>
+
+</body>
+</html>
